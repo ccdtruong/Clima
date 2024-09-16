@@ -39,11 +39,21 @@ struct APIManager {
                 }
                 
                 if let responseData = data {
-                    let dataString = String(data: responseData, encoding: .utf8)
-                    print(dataString ?? "nil")
+                    parseJSON(responseData)
                 }
             }
             dataTask.resume()
+        }
+    }
+    
+    func parseJSON(_ jsonData : Data){
+        let decoder = JSONDecoder()
+        do {
+            let decodeData = try decoder.decode(WeatherData.self, from: jsonData)
+            print("\(decodeData.name)-\(decodeData.main.temp)-\(decodeData.weather[0].description)")
+        }
+        catch{
+            print(error)
         }
     }
 }
