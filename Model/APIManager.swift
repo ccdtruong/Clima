@@ -9,22 +9,27 @@
 import Foundation
 protocol APIManagerDelegate {
     func didUpdateWeather (_ weatherModel : WeatherModel)
+    func didFailWithError(_ error: Error)
 }
 struct APIManager {
-    var apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&"
+    var apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&lang=vi&"
     var appid = "fa2e7641b493088d4b4a808c143b2c23"
     var cityName = "Hanoi"
     
     var delegate : APIManagerDelegate?
     
     mutating func setCityname(_ city : String) {
-        cityName = city
+        if let validCityName = city.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed){
+            cityName = validCityName
+        }
+        else {
+            cityName = ""
+        }
     }
     
     func fecthWeather() {
         
         let urlString = createRequestUrl()
-        print(urlString)
         performRequest(urlString)
     }
     
@@ -38,7 +43,7 @@ struct APIManager {
             let session = URLSession(configuration: .default)
             let dataTask = session.dataTask(with: url) { data, response, error in
                 if error != nil {
-                    print(error!)
+                    delegate?.didFailWithError(error!)
                     return
                 }
                 
@@ -63,7 +68,7 @@ struct APIManager {
             return  WeatherModel(id: id, cityName: cityName, temperature: temp)
         }
         catch{
-            print(error)
+            delegate?.didFailWithError(error)
             return nil
         }
     }
