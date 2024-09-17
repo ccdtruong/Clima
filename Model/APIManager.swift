@@ -7,11 +7,15 @@
 //
 
 import Foundation
-
+protocol APIManagerDelegate {
+    func didUpdateWeather (_ weatherModel : WeatherModel)
+}
 struct APIManager {
     var apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&"
     var appid = "fa2e7641b493088d4b4a808c143b2c23"
     var cityName = "Hanoi"
+    
+    var delegate : APIManagerDelegate?
     
     mutating func setCityname(_ city : String) {
         cityName = city
@@ -39,21 +43,28 @@ struct APIManager {
                 }
                 
                 if let responseData = data {
-                    parseJSON(responseData)
+                    if let weatherModel = parseJSON(responseData) {
+                        delegate?.didUpdateWeather(weatherModel)
+                    }
                 }
             }
             dataTask.resume()
         }
     }
     
-    func parseJSON(_ jsonData : Data){
+    func parseJSON(_ jsonData : Data) -> WeatherModel?{
         let decoder = JSONDecoder()
         do {
             let decodeData = try decoder.decode(WeatherData.self, from: jsonData)
-            print("\(decodeData.name)-\(decodeData.main.temp)-\(decodeData.weather[0].description)")
+            let id = decodeData.weather[0].id
+            let cityName = decodeData.name
+            let temp = decodeData.main.temp
+            
+            return  WeatherModel(id: id, cityName: cityName, temperature: temp)
         }
         catch{
             print(error)
+            return nil
         }
     }
 }
