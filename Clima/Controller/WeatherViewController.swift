@@ -9,9 +9,8 @@
 import UIKit
 import CoreLocation
 
-class WeatherViewController: UIViewController, UITextFieldDelegate, APIManagerDelegate, CLLocationManagerDelegate {
+class WeatherViewController: UIViewController{
     
-
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var cityLabel: UILabel!
@@ -30,10 +29,10 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, APIManagerDe
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
     }
+}
 
-    @IBAction func locationPressed(_ sender: UIButton) {
-        locationManager.requestLocation()
-    }
+//MARK: -UITextFieldDelegate
+extension WeatherViewController: UITextFieldDelegate{
     
     @IBAction func searchPressed(_ sender: UIButton) {
         searchTextField.endEditing(true)
@@ -61,7 +60,10 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, APIManagerDe
         apiManager.fecthWeather()
         textField.text = ""
     }
-    
+}
+
+//MARK: -APIManagerDelegate
+extension WeatherViewController:APIManagerDelegate{
     func didUpdateWeather(_ weatherModel: WeatherModel) {
         DispatchQueue.main.async {
             self.conditionImageView.image = UIImage(systemName: weatherModel.conditionIconName)
@@ -72,6 +74,13 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, APIManagerDe
     
     func didFailWithError(_ error: any Error) {
         print(error)
+    }
+}
+
+//MARK: -CLLocationManagerDelegate
+extension WeatherViewController: CLLocationManagerDelegate{
+    @IBAction func locationPressed(_ sender: UIButton) {
+        locationManager.requestLocation()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
