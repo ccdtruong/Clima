@@ -10,7 +10,7 @@ import Foundation
 import CoreLocation
 
 protocol APIManagerDelegate {
-    func didUpdateWeather (_ weatherModel : WeatherModel)
+    func didUpdateWeather (_ weatherModel : WeatherModel, _ forecastResponse : ForecastList)
     func didFailWithError(_ error: Error)
 }
 
@@ -21,18 +21,22 @@ enum FecthError: Error{
 }
 
 struct APIManager {
-    var apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&lang=vi&"
+    var apiUrl = "https://api.openweathermap.org/data/2.5/"
     var appid = "fa2e7641b493088d4b4a808c143b2c23"
     
-    var urlString = ""
+    var currentUrlString = ""
+    var forecastUrlString = ""
     var delegate : APIManagerDelegate?
     
     func fecthWeather() {
 //        performRequest(urlString)
         Task{
             do{
-                let dataModel = try await fecthWeatherData(from: urlString, responeType: WeatherModel.self)
-                delegate?.didUpdateWeather(dataModel)
+                let currentWeatherModel = try await fecthWeatherData(from: currentUrlString, responeType: WeatherModel.self)
+                let forecastWeatherModel = try await fecthWeatherData(from: forecastUrlString, responeType: ForecastList.self)
+                
+                //var forecastWeatherModel = ForecastList(list: [])
+                delegate?.didUpdateWeather(currentWeatherModel, forecastWeatherModel)
             }
             catch{
                 delegate?.didFailWithError(error)
@@ -42,15 +46,18 @@ struct APIManager {
     
     mutating func createRequestUrl(city cityName : String) {
         if let validCityName = cityName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed){
-            urlString = "\(apiUrl)appid=\(appid)&q=\(validCityName)"
+            currentUrlString = "\(apiUrl)weather?units=metric&lang=vi&appid=\(appid)&q=\(validCityName)"
+            forecastUrlString = "\(apiUrl)forecast?units=metric&lang=vi&appid=\(appid)&q=\(validCityName)"
         }
     }
     
     mutating func createRequestUrl(coordinate : CLLocationCoordinate2D) {
-        urlString = "\(apiUrl)appid=\(appid)&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)"
+        currentUrlString = "\(apiUrl)weather?units=metric&lang=vi&appid=\(appid)&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)"
+        forecastUrlString = "\(apiUrl)forecast?units=metric&lang=vi&appid=\(appid)&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)"
     }
  
     func fecthWeatherData<T: Decodable> (from urlString : String, responeType: T.Type) async throws -> T {
+        print(urlString)
         guard let url = URL(string: urlString) else {
             throw FecthError.urlError
         }
@@ -67,7 +74,5 @@ struct APIManager {
         catch{
             throw FecthError.decodeError
         }
-        
-        
     }
 }

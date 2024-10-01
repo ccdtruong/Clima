@@ -21,6 +21,7 @@ class WeatherViewController: UIViewController{
     
     var apiManager = APIManager()
     var locationManager = CLLocationManager()
+    var forecastWeatherModel : [ForecastWeatherModel] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,14 +31,25 @@ class WeatherViewController: UIViewController{
     private func setupWeatherView() {
         apiManager.delegate = self
         searchTextField.delegate = self
-        //set up collection view
-        forecastCollectionView.register(UINib(nibName: "ForecastCell", bundle: nil), forCellWithReuseIdentifier: "ForecastCell")
-        forecastCollectionView.dataSource = self
+        setupCollectionView()
+        
         //set up location manager
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
 
+    }
+    private func setupCollectionView(){
+        forecastCollectionView.register(UINib(nibName: "ForecastCell", bundle: nil), forCellWithReuseIdentifier: "ForecastCell")
+        forecastCollectionView.dataSource = self
+        forecastCollectionView.isHidden = true
+        
+        //setup layout
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 0
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 150, height: 200)
+        forecastCollectionView.collectionViewLayout = layout
     }
 }
 
@@ -70,17 +82,26 @@ extension WeatherViewController: UITextFieldDelegate{
         }
         apiManager.fecthWeather()
         textField.text = ""
+        forecastCollectionView.setContentOffset(.zero, animated: true)
     }
 }
 
 //MARK: -APIManagerDelegate
 extension WeatherViewController:APIManagerDelegate{
-    func didUpdateWeather(_ weatherModel: WeatherModel) {
+    func didUpdateWeather(_ weatherModel: WeatherModel, _ forecastResponse: ForecastList) {
         DispatchQueue.main.async {
             self.temperatureLabel.text = String(format: "%.1f °C", weatherModel.temperature)
             self.cityLabel.text = weatherModel.cityName
             self.DescriptionLabel.text = weatherModel.description
             self.conditionImageView.kf.setImage(with: URL(string: "https://openweathermap.org/img/wn/\(weatherModel.icon)@2x.png"))
+            
+            guard !forecastResponse.list.isEmpty else {
+                self.forecastCollectionView.isHidden = true
+                return
+            }
+            self.forecastCollectionView.isHidden = false
+            self.forecastWeatherModel = forecastResponse.list
+            self.forecastCollectionView.reloadData()
         }
     }
     
@@ -100,6 +121,8 @@ extension WeatherViewController: CLLocationManagerDelegate{
             locationManager.stopUpdatingLocation()
             apiManager.createRequestUrl(coordinate: location.coordinate)
             apiManager.fecthWeather()
+            
+            forecastCollectionView.setContentOffset(.zero, animated: true)
         }
     }
     
@@ -111,11 +134,17 @@ extension WeatherViewController: CLLocationManagerDelegate{
 //MARK: -CollectionViewDataSource
 extension WeatherViewController: UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        <#code#>
+        forecastWeatherModel.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        <#code#>
+        let cell = forecastCollectionView.dequeueReusableCell(withReuseIdentifier: "ForecastCell", for: indexPath) as! ForecastCell
+        
+        cell.dateLabel.text = forecastWeatherModel[indexPath.row].date
+        cell.timeLabel.text = forecastWeatherModel[indexPath.row].time
+        cell.tempLabel.text = String(format: "%.1f °C", forecastWeatherModel[indexPath.row].temp)
+        cell.Icon.kf.setImage(with: URL(string: "https://openweathermap.org/img/wn/\(forecastWeatherModel[indexPath.row].icon)@2x.png"))
+        return cell
     }
     
     

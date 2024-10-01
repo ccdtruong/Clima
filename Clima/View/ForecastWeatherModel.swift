@@ -12,7 +12,7 @@ struct ForecastWeatherModel: Decodable{
     let date : String
     let time : String
     let icon : String
-    let temp : String
+    let temp : Double
     
     enum CodingKeys : String, CodingKey{
         case dateTime = "dt"
@@ -29,7 +29,6 @@ struct ForecastWeatherModel: Decodable{
     }
     init(from decoder: any Decoder) throws {
         let data = try decoder.container(keyedBy: CodingKeys.self)
-        
         let timeStamp = try data.decode(Int.self, forKey: .dateTime)// get timeStamp
         let date = Date(timeIntervalSince1970: TimeInterval(timeStamp))//Convert to human date
         // format for hour
@@ -40,12 +39,16 @@ struct ForecastWeatherModel: Decodable{
         let dateFormatted = DateFormatter()
         dateFormatted.dateFormat = "dd/MM"
         self.date = dateFormatted.string(from: date)
+        //Decode temp
+        let main = try data.nestedContainer(keyedBy: MainKeys.self, forKey: .main)
+        temp = try main.decode(Double.self, forKey: .temp)
         //Decode icon from first element weather array
         var weatherArray = try data.nestedUnkeyedContainer(forKey: .weather)
         let weather = try weatherArray.nestedContainer(keyedBy: WeatherKeys.self)
         icon = try weather.decode(String.self, forKey: .icon)
-        //Decode temp
-        let main = try data.nestedContainer(keyedBy: MainKeys.self, forKey: .main)
-        temp = try main.decode(String.self, forKey: .temp)
     }
+}
+
+struct ForecastList: Decodable{
+    var list : [ForecastWeatherModel]
 }
