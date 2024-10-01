@@ -135,6 +135,7 @@
                         <outlet property="DescriptionLabel" destination="qgx-cN-EWO" id="q6g-dr-ANj"/>
                         <outlet property="cityLabel" destination="CWP-r8-Jsy" id="8cQ-3l-ufV"/>
                         <outlet property="conditionImageView" destination="mYn-vV-MBC" id="gpD-FU-YB0"/>
+                        <outlet property="forecastCollectionView" destination="teP-K9-t7a" id="9U0-vG-XBf"/>
                         <outlet property="searchTextField" destination="2eh-wL-W34" id="KgL-oS-8bG"/>
                         <outlet property="temperatureLabel" destination="w9o-tW-03D" id="mF4-vV-JxK"/>
                     </connections>

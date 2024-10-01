@@ -17,6 +17,7 @@ class WeatherViewController: UIViewController{
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var DescriptionLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
+    @IBOutlet weak var forecastCollectionView: UICollectionView!
     
     var apiManager = APIManager()
     var locationManager = CLLocationManager()
@@ -24,14 +25,22 @@ class WeatherViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        setupWeatherView()
+    }
+    private func setupWeatherView() {
         apiManager.delegate = self
         searchTextField.delegate = self
+        //set up collection view
+        forecastCollectionView.register(UINib(nibName: "ForecastCell", bundle: nil), forCellWithReuseIdentifier: "ForecastCell")
+        forecastCollectionView.dataSource = self
+        //set up location manager
         locationManager.delegate = self
-        
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
+
     }
 }
+
 
 //MARK: -UITextFieldDelegate
 extension WeatherViewController: UITextFieldDelegate{
@@ -99,3 +108,15 @@ extension WeatherViewController: CLLocationManagerDelegate{
     }
 }
 
+//MARK: -CollectionViewDataSource
+extension WeatherViewController: UICollectionViewDataSource{
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        <#code#>
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        <#code#>
+    }
+    
+    
+}
