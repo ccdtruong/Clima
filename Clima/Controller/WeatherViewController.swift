@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreLocation
+import Kingfisher
 
 class WeatherViewController: UIViewController{
     
@@ -56,7 +57,7 @@ extension WeatherViewController: UITextFieldDelegate{
     
     func textFieldDidEndEditing(_ textField: UITextField) {
         if let city = searchTextField.text {
-            apiManager.createRequest(city: city)
+            apiManager.createRequestUrl(city: city)
         }
         apiManager.fecthWeather()
         textField.text = ""
@@ -67,10 +68,10 @@ extension WeatherViewController: UITextFieldDelegate{
 extension WeatherViewController:APIManagerDelegate{
     func didUpdateWeather(_ weatherModel: WeatherModel) {
         DispatchQueue.main.async {
-            self.conditionImageView.image = UIImage(systemName: weatherModel.conditionIconName)
-            self.temperatureLabel.text = weatherModel.temperatureToString
+            self.temperatureLabel.text = String(format: "%.1f °C", weatherModel.temperature)
             self.cityLabel.text = weatherModel.cityName
             self.DescriptionLabel.text = weatherModel.description
+            self.conditionImageView.kf.setImage(with: URL(string: "https://openweathermap.org/img/wn/\(weatherModel.icon)@2x.png"))
         }
     }
     
@@ -88,7 +89,7 @@ extension WeatherViewController: CLLocationManagerDelegate{
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             locationManager.stopUpdatingLocation()
-            apiManager.createRequest(coordinate: location.coordinate)
+            apiManager.createRequestUrl(coordinate: location.coordinate)
             apiManager.fecthWeather()
         }
     }

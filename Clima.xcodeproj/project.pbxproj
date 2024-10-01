@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		29758A2D2CAC3F8A00064644 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 29758A2C2CAC3F8A00064644 /* Kingfisher */; };
 		299DB5202C982F4F0052AAC2 /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 299DB51F2C982F4F0052AAC2 /* APIManager.swift */; };
-		299DB5352C9895940052AAC2 /* WeatherData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 299DB5342C9895940052AAC2 /* WeatherData.swift */; };
 		299DB5372C996A070052AAC2 /* WeatherModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 299DB5362C996A070052AAC2 /* WeatherModel.swift */; };
 		ADAA27B1231BBFAF00365194 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAA27B0231BBFAF00365194 /* AppDelegate.swift */; };
 		ADAA27B3231BBFAF00365194 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAA27B2231BBFAF00365194 /* SceneDelegate.swift */; };
@@ -21,7 +21,6 @@
 
 /* Begin PBXFileReference section */
 		299DB51F2C982F4F0052AAC2 /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = APIManager.swift; path = Model/APIManager.swift; sourceTree = SOURCE_ROOT; };
-		299DB5342C9895940052AAC2 /* WeatherData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeatherData.swift; path = Model/WeatherData.swift; sourceTree = SOURCE_ROOT; };
 		299DB5362C996A070052AAC2 /* WeatherModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WeatherModel.swift; path = Model/WeatherModel.swift; sourceTree = SOURCE_ROOT; };
 		ADAA27AD231BBFAF00365194 /* Clima.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Clima.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADAA27B0231BBFAF00365194 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -39,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29758A2D2CAC3F8A00064644 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,7 +97,6 @@
 			isa = PBXGroup;
 			children = (
 				299DB51F2C982F4F0052AAC2 /* APIManager.swift */,
-				299DB5342C9895940052AAC2 /* WeatherData.swift */,
 				299DB5362C996A070052AAC2 /* WeatherModel.swift */,
 			);
 			path = Model;
@@ -119,6 +118,9 @@
 			dependencies = (
 			);
 			name = Clima;
+			packageProductDependencies = (
+				29758A2C2CAC3F8A00064644 /* Kingfisher */,
+			);
 			productName = Clima;
 			productReference = ADAA27AD231BBFAF00365194 /* Clima.app */;
 			productType = "com.apple.product-type.application";
@@ -147,6 +149,9 @@
 				Base,
 			);
 			mainGroup = ADAA27A4231BBFAF00365194;
+			packageReferences = (
+				29758A2B2CAC3F8A00064644 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+			);
 			productRefGroup = ADAA27AE231BBFAF00365194 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -176,7 +181,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				299DB5202C982F4F0052AAC2 /* APIManager.swift in Sources */,
-				299DB5352C9895940052AAC2 /* WeatherData.swift in Sources */,
 				ADAA27B5231BBFAF00365194 /* WeatherViewController.swift in Sources */,
 				ADAA27B1231BBFAF00365194 /* AppDelegate.swift in Sources */,
 				299DB5372C996A070052AAC2 /* WeatherModel.swift in Sources */,
@@ -378,6 +382,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		29758A2B2CAC3F8A00064644 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		29758A2C2CAC3F8A00064644 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29758A2B2CAC3F8A00064644 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = ADAA27A5231BBFAF00365194 /* Project object */;
 }

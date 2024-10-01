@@ -13,6 +13,13 @@ protocol APIManagerDelegate {
     func didUpdateWeather (_ weatherModel : WeatherModel)
     func didFailWithError(_ error: Error)
 }
+
+enum FecthError: Error{
+    case urlError
+    case responseError
+    case decodeError
+}
+
 struct APIManager {
     var apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&lang=vi&"
     var appid = "fa2e7641b493088d4b4a808c143b2c23"
@@ -21,53 +28,46 @@ struct APIManager {
     var delegate : APIManagerDelegate?
     
     func fecthWeather() {
-        performRequest(urlString)
+//        performRequest(urlString)
+        Task{
+            do{
+                let dataModel = try await fecthWeatherData(from: urlString, responeType: WeatherModel.self)
+                delegate?.didUpdateWeather(dataModel)
+            }
+            catch{
+                delegate?.didFailWithError(error)
+            }
+        }
     }
     
-    mutating func createRequest(city cityName : String) {
+    mutating func createRequestUrl(city cityName : String) {
         if let validCityName = cityName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed){
             urlString = "\(apiUrl)appid=\(appid)&q=\(validCityName)"
         }
     }
     
-    mutating func createRequest(coordinate : CLLocationCoordinate2D) {
+    mutating func createRequestUrl(coordinate : CLLocationCoordinate2D) {
         urlString = "\(apiUrl)appid=\(appid)&lat=\(coordinate.latitude)&lon=\(coordinate.longitude)"
     }
-    
-    func performRequest(_ urlString : String)
-    {
-        if let url = URL(string: urlString) {
-            let session = URLSession(configuration: .default)
-            let dataTask = session.dataTask(with: url) { data, response, error in
-                if error != nil {
-                    delegate?.didFailWithError(error!)
-                    return
-                }
-                
-                if let responseData = data {
-                    if let weatherModel = parseJSON(responseData) {
-                        delegate?.didUpdateWeather(weatherModel)
-                    }
-                }
-            }
-            dataTask.resume()
+ 
+    func fecthWeatherData<T: Decodable> (from urlString : String, responeType: T.Type) async throws -> T {
+        guard let url = URL(string: urlString) else {
+            throw FecthError.urlError
         }
-    }
-    
-    func parseJSON(_ jsonData : Data) -> WeatherModel?{
-        let decoder = JSONDecoder()
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw FecthError.responseError
+        }
+        
         do {
-            let decodeData = try decoder.decode(WeatherData.self, from: jsonData)
-            let id = decodeData.weather[0].id
-            let cityName = decodeData.name
-            let temp = decodeData.main.temp
-            let des = decodeData.weather.description
-            
-            return  WeatherModel(id: id, cityName: cityName, temperature: temp, description: des)
+            let decoder = JSONDecoder()
+            return try decoder.decode(T.self, from: data)
         }
         catch{
-            delegate?.didFailWithError(error)
-            return nil
+            throw FecthError.decodeError
         }
+        
+        
     }
 }

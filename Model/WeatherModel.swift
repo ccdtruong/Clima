@@ -8,35 +8,39 @@
 
 import Foundation
 
-struct WeatherModel {
-    let id : Int
+struct WeatherModel: Decodable {
     let cityName : String
-    let temperature : Float
+    let temperature : Double
     let description : String
+    let icon : String
     
-    var temperatureToString : String {
-        return String(format: "%.1f", temperature)
+    enum CodingKeys: String, CodingKey {
+        case name
+        case main
+        case weather
     }
     
-    var conditionIconName : String {
-        switch id {
-                case 200...232:
-                    return "cloud.bolt"
-                case 300...321:
-                    return "cloud.drizzle"
-                case 500...531:
-                    return "cloud.rain"
-                case 600...622:
-                    return "cloud.snow"
-                case 701...781:
-                    return "cloud.fog"
-                case 800:
-                    return "sun.max"
-                case 801...804:
-                    return "cloud.bolt"
-                default:
-                    return "cloud"
-                }
-
+    enum MainKeys: String, CodingKey {
+        case temp
+    }
+    
+    enum WeatherKeys: String, CodingKey {
+        case description
+        case icon
+    }
+    
+    init(from decoder: any Decoder) throws {
+        let data = try decoder.container(keyedBy: CodingKeys.self)
+        //Decode city name
+        cityName = try data.decode(String.self, forKey: .name)//Decode city name
+        
+        let main = try data.nestedContainer(keyedBy: MainKeys.self, forKey: .main)//Decode main keys
+        temperature = try main.decode(Double.self, forKey: .temp)//Decode temp in main keys
+        
+        var weatherArray = try data.nestedUnkeyedContainer(forKey: .weather)//Decode weather array
+        let weather = try weatherArray.nestedContainer(keyedBy: WeatherKeys.self)//Get first element in weather array
+        //Decode des and icon in weather keys
+        description = try weather.decode(String.self, forKey: .description)
+        icon = try weather.decode(String.self, forKey: .icon)
     }
 }
