@@ -12,6 +12,7 @@ struct WeatherModel {
     let id : Int
     let cityName : String
     let temperature : Float
+    let description : String
     
     var temperatureToString : String {
         return String(format: "%.1f", temperature)

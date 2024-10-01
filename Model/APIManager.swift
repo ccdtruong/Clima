@@ -61,8 +61,9 @@ struct APIManager {
             let id = decodeData.weather[0].id
             let cityName = decodeData.name
             let temp = decodeData.main.temp
+            let des = decodeData.weather.description
             
-            return  WeatherModel(id: id, cityName: cityName, temperature: temp)
+            return  WeatherModel(id: id, cityName: cityName, temperature: temp, description: des)
         }
         catch{
             delegate?.didFailWithError(error)
